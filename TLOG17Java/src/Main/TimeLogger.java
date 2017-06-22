@@ -2,11 +2,11 @@ package Main;
 
 import java.util.*;
 
-class TimeLogger{
+public class TimeLogger{
     private List<WorkMonth> months;
-
-    public List<WorkMonth> getMonths() {
-        return months;
+    
+    public void addMonth(WorkMonth month){
+        if (isNewMonth(month)) months.add(month);
     }
     
     public boolean isNewMonth(WorkMonth monthToCompare){
@@ -18,7 +18,7 @@ class TimeLogger{
         return true;
     }
     
-    public void addMonth(WorkMonth month){
-        if (isNewMonth(month)) months.add(month);
+    public List<WorkMonth> getMonths() {
+        return months;
     }
 }

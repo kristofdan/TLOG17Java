@@ -10,35 +10,68 @@ public class Task {
     private LocalTime endTime;
     private String comment;
     
-    Task(String taskId, String comment, int startHour, int startMinute, int endHour, int endMinute){
+    public Task(String taskId, String comment, int startHour, int startMinute, int endHour, int endMinute){
         this.taskId = taskId;
         this.comment = comment;
         startTime = LocalTime.of(startHour, startMinute);
         endTime = LocalTime.of(endHour, endMinute);
     }
-    Task(String taskId, String comment, String startTime, String endTime){
+    
+    public Task(String taskId, String comment, String startTime, String endTime){
         this.taskId = taskId;
         this.comment = comment;
         this.startTime = LocalTime.parse(startTime);
         this.endTime = LocalTime.parse(endTime);
     }
-    public String getTaskId() {return taskId;}
-    public LocalTime getStartTime() {return startTime;}
-    public LocalTime getEndTime() {return endTime;}
-    public String getComment() {return comment;}
+
+    public Task(String taskId) {
+        this.taskId = taskId;
+    }
+    
     public long getMinPerTask() {
-        long hourDiff =
-                endTime.getLong(ChronoField.HOUR_OF_DAY) - startTime.getLong(ChronoField.HOUR_OF_DAY);
-        long minuteDiff =
-                endTime.getLong(ChronoField.MINUTE_OF_DAY) - startTime.getLong(ChronoField.MINUTE_OF_DAY);
-        return hourDiff * 60 + minuteDiff;
+        return Util.minPerTask(startTime, endTime);
     }
     public boolean isValidTaskId(){
-        boolean isExactlyFourDigits = Pattern.matches("^\\d\\d\\d\\d$", comment);
-        boolean isExactlyLtAndFourDigits = Pattern.matches("^LT-\\d\\d\\d\\d$", comment);
-        return isExactlyFourDigits || isExactlyLtAndFourDigits;
+        return isValidRedmineTaskId() || isValidLTTaskId();
     }
-    public boolean isMultipleQuarterHour(){
-        return (getMinPerTask() % 15 == 0);
+    
+    public boolean isValidRedmineTaskId(){
+        return Pattern.matches("^\\d\\d\\d\\d$", comment);
+    }
+    
+    public boolean isValidLTTaskId(){
+        return Pattern.matches("^LT-\\d\\d\\d\\d$", comment);
+    }
+
+    public String getTaskId() {return taskId;}
+    
+    public LocalTime getStartTime() {return startTime;}
+    
+    public LocalTime getEndTime() {return endTime;}
+    
+    public String getComment() {return comment;}
+    
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+    public void setStartTime(int hour, int minute) {
+        this.startTime = LocalTime.of(hour, minute);
+    }
+    
+    public void setStartTime(String startTimeAsString) {
+        this.startTime = LocalTime.parse(startTimeAsString);
+    }
+
+    public void setEndTime(int hour, int minute) {
+        this.endTime = LocalTime.of(hour, minute);
+    }
+    
+    public void setEndTime(String endTimeAsString) {
+        this.endTime = LocalTime.parse(endTimeAsString);
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

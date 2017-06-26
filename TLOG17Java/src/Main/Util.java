@@ -58,7 +58,7 @@ public class Util {
         long hourDiff =
                 endTime.getLong(ChronoField.HOUR_OF_DAY) - startTime.getLong(ChronoField.HOUR_OF_DAY);
         long minuteDiff =
-                endTime.getLong(ChronoField.MINUTE_OF_DAY) - startTime.getLong(ChronoField.MINUTE_OF_DAY);
+                endTime.getLong(ChronoField.MINUTE_OF_HOUR) - startTime.getLong(ChronoField.MINUTE_OF_HOUR);
         return hourDiff * 60 + minuteDiff;
     }
 }

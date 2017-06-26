@@ -1,7 +1,6 @@
 package Main;
 
 import java.time.*;
-import java.time.temporal.ChronoField;
 import java.util.regex.*;
 
 public class Task {
@@ -35,21 +34,33 @@ public class Task {
         return isValidRedmineTaskId() || isValidLTTaskId();
     }
     
-    public boolean isValidRedmineTaskId(){
-        return Pattern.matches("^\\d\\d\\d\\d$", comment);
+    private boolean isValidRedmineTaskId(){
+        return Pattern.matches("^\\d\\d\\d\\d$", taskId);
     }
     
-    public boolean isValidLTTaskId(){
-        return Pattern.matches("^LT-\\d\\d\\d\\d$", comment);
+    private boolean isValidLTTaskId(){
+        return Pattern.matches("^LT-\\d\\d\\d\\d$", taskId);
+    }
+    
+    public String toString(){
+        return taskId + " " + comment;
     }
 
-    public String getTaskId() {return taskId;}
+    public String getTaskId() {
+        return taskId;
+    }
     
-    public LocalTime getStartTime() {return startTime;}
+    public LocalTime getStartTime() {
+        return startTime;
+    }
     
-    public LocalTime getEndTime() {return endTime;}
+    public LocalTime getEndTime() {
+        return endTime;
+    }
     
-    public String getComment() {return comment;}
+    public String getComment() {
+        return comment;
+    }
     
     public void setTaskId(String taskId) {
         this.taskId = taskId;

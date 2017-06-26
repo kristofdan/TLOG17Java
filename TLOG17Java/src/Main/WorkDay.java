@@ -31,14 +31,10 @@ public class WorkDay {
                 LocalDate.now().getDayOfMonth());
     } 
     
-   public WorkDay(long requiredMinPerDay, int year, int month, int day) {
+    public WorkDay(long requiredMinPerDay, int year, int month, int day) {
         this.requiredMinPerDay = requiredMinPerDay;
         actualDay = LocalDate.of(year, month, day);
-    }
-
-//Can return negative value
-    public long getExtraMinPerDay(){
-        return requiredMinPerDay - sumPerDay;
+        tasks = new LinkedList<>();
     }
     
     public void addTask(Task t){
@@ -48,6 +44,27 @@ public class WorkDay {
         else {
             //To be implemented later
         }
+    }
+    
+    private void calculateSumPerDay(){
+       sumPerDay = 0;
+       for (Task currentTask : tasks) {
+           sumPerDay += currentTask.getMinPerTask();
+       }
+   }
+   
+    public long getExtraMinPerDay(){
+        return sumPerDay - requiredMinPerDay;
+    }
+    
+    public LocalTime getLatestEndTime(){
+        LocalTime max = tasks.get(0).getEndTime();
+        for (Task task : tasks){
+            if (task.getEndTime().compareTo(max) > 0){
+                max = task.getEndTime();
+            }
+        }
+        return max;
     }
 
     public LocalDate getActualDay() {
@@ -59,6 +76,7 @@ public class WorkDay {
     }
 
     public long getSumPerDay() {
+        calculateSumPerDay();
         return sumPerDay;
     }
 

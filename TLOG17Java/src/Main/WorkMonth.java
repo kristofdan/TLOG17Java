@@ -9,23 +9,27 @@ public class WorkMonth {
     private long sumPerMonth;
     private long requiredMinPerMonth;
 
-//Where do we calculate the two other fields?
     public WorkMonth(int year, int month){
         date = YearMonth.of(year, month);
+        days = new LinkedList<>();
     }
     
-//Can return negative value
+    //Can return negative value
     public long getExtraMinPerMonth(){
-        return requiredMinPerMonth - sumPerMonth;
+        return sumPerMonth - requiredMinPerMonth;
     }
     
-    public void addWorkDay(WorkDay wd){
-        addWorkDay(wd, false);
+    public boolean addWorkDay(WorkDay wd){
+        return addWorkDay(wd, false);
     }
     
-    public void addWorkDay(WorkDay wd, boolean isWeekendEnabled){
+    public boolean addWorkDay(WorkDay wd, boolean isWeekendEnabled){
         if ((Util.isWeekday(wd.getActualDay()) || isWeekendEnabled) && isSameMonth(wd) && isNewDate(wd)){
             days.add(wd);
+            return true;
+        }else {
+            System.out.println("Not a proper day for this month");
+            return false;
         }
     }
     
@@ -44,6 +48,20 @@ public class WorkMonth {
         else return false;
     }
     
+    private void calculateSumPerMonth(){
+        sumPerMonth = 0;
+        for (WorkDay currentDay : days) {
+            sumPerMonth += currentDay.getSumPerDay();
+        }
+    }
+    
+    private void calculateRequiredMinPerMonth(){
+        requiredMinPerMonth = 0;
+        for (WorkDay currentDay : days) {
+            requiredMinPerMonth += currentDay.getRequiredMinPerDay();
+        }
+    }
+    
     public List<WorkDay> getDays() {
         return days;
     }
@@ -53,10 +71,12 @@ public class WorkMonth {
     }
 
     public long getSumPerMonth() {
+        calculateSumPerMonth();
         return sumPerMonth;
     }
 
     public long getRequiredMinPerMonth() {
+        calculateRequiredMinPerMonth();
         return requiredMinPerMonth;
     }
 }

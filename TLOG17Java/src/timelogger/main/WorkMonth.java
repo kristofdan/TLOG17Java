@@ -1,4 +1,4 @@
-package Main;
+package timelogger.main;
 
 import java.util.*;
 import java.time.*;

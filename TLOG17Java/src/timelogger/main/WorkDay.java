@@ -1,7 +1,8 @@
-package Main;
+package timelogger.main;
 
 import java.util.*;
 import java.time.*;
+import timelogger.exceptions.*;
 
 public class WorkDay {
     private List<Task> tasks;
@@ -21,28 +22,33 @@ public class WorkDay {
                 LocalDate.now().getMonthValue(), LocalDate.now().getDayOfMonth());
     }
     
-    public WorkDay(long requiredMinPerDay, int year) {
-        this(requiredMinPerDay, year,
-                LocalDate.now().getMonthValue(), LocalDate.now().getDayOfMonth());
+    public WorkDay(int year, int month, int day){
+        this(450, year, month, day);
     }
     
-    public WorkDay(long requiredMinPerDay, int year, int month) {
-        this(requiredMinPerDay, year, month,
-                LocalDate.now().getDayOfMonth());
-    } 
-    
     public WorkDay(long requiredMinPerDay, int year, int month, int day) {
-        this.requiredMinPerDay = requiredMinPerDay;
-        actualDay = LocalDate.of(year, month, day);
+        if (requiredMinPerDay < 0)
+        {
+            throw new NegativeMinutesOfWorkException();
+        }else {
+            this.requiredMinPerDay = requiredMinPerDay;
+        }
+        
+        LocalDate newActualDay = LocalDate.of(year, month, day);
+        if (newActualDay.isAfter(LocalDate.now())){
+            throw new FutureWorkException();
+        }else {
+            actualDay = newActualDay;
+        }
         tasks = new LinkedList<>();
     }
     
     public void addTask(Task t){
-        if (Util.isSeparatedTime(t,tasks) && Util.isMultipleQuarterHour(t.getStartTime(), t.getEndTime())){
+        if (Util.isSeparatedTime(t,tasks)){
             tasks.add(t);
         }
         else {
-            //To be implemented later
+            throw new NotSeparatedTimesException();
         }
     }
     
@@ -54,17 +60,23 @@ public class WorkDay {
    }
    
     public long getExtraMinPerDay(){
+        calculateSumPerDay();
         return sumPerDay - requiredMinPerDay;
     }
     
+    //DIfferent from requested: If there are no tasks, returns 00:00 (more convenient to use)
     public LocalTime getLatestEndTime(){
-        LocalTime max = tasks.get(0).getEndTime();
-        for (Task task : tasks){
-            if (task.getEndTime().compareTo(max) > 0){
-                max = task.getEndTime();
+        if (tasks.isEmpty()){
+            return LocalTime.of(0, 0);
+        }else {
+            LocalTime max = tasks.get(0).getEndTime();
+            for (Task task : tasks){
+                if (task.getEndTime().compareTo(max) > 0){
+                    max = task.getEndTime();
+                }
             }
+            return max;
         }
-        return max;
     }
 
     public LocalDate getActualDay() {
@@ -85,11 +97,21 @@ public class WorkDay {
     }
     
     public void setActualDay(int year, int month, int day) {
-        this.actualDay = LocalDate.of(year, month, day);
+        LocalDate newActualDay = LocalDate.of(year, month, day);
+        if (newActualDay.isAfter(LocalDate.now())){
+            throw new FutureWorkException();
+        }else {
+            actualDay = newActualDay;
+        }
     }
 
     public void setRequiredMinPerDay(long requiredMinPerDay) {
-        this.requiredMinPerDay = requiredMinPerDay;
+        if (requiredMinPerDay < 0)
+        {
+            throw new NegativeMinutesOfWorkException();
+        }else {
+            this.requiredMinPerDay = requiredMinPerDay;
+        }
     }
     
     

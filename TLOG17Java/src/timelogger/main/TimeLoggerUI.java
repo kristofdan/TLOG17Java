@@ -1,8 +1,9 @@
-package Main;
+package timelogger.main;
 
 import java.util.*;
 import java.util.regex.Pattern;
 import java.time.*;
+import timelogger.exceptions.*;
 
 public class TimeLoggerUI {
     
@@ -174,7 +175,7 @@ public class TimeLoggerUI {
         for (Task currentTask : chosenDay.getTasks()) {
             System.out.print(currentTask.getTaskId() + " " + currentTask.getComment() + " " +
                     currentTask.getStartTime() + " ");
-            if (currentTask.getEndTime() == null){
+            if (currentTask.getEndTime().equals(currentTask.getStartTime())){
                 System.out.print("end time not specified yet\n");
             }else {
                 System.out.print(currentTask.getEndTime() + "\n");
@@ -262,37 +263,35 @@ public class TimeLoggerUI {
     //Sets endTime to startTime (couldn't insert it if endTime would be empty)
     private void addTaskToDay(){
         listTasksForChosenDay();
-        String taskID = askForTaskID(false);
+        String taskID = askForTaskID();
         System.out.println("Description: ");
         String comment = scanner.nextLine();
-        printLastTaskOfTheDay();
-        String startTime = askForStartTime(false);
-        Task newTask = new Task(taskID);
-        newTask.setComment(comment);
-        newTask.setStartTime(startTime);
-        newTask.setEndTime(startTime);
-        chosenDay.addTask(newTask);
+        printLatestEndTimeOfTheDay();
+        String startTime = askForStartTime(true);
+        if (startTime.equals("")){
+            startTime = chosenDay.getLatestEndTime().toString();
+        }
+        try{
+            Task newTask = new Task(taskID,comment,startTime,startTime);
+            chosenDay.addTask(newTask);
+        }catch (NoTaskIdException e){
+            System.out.println("Error: empty task ID");
+        }catch (InvalidTaskIdException e){
+            System.out.println("Error: invalid task ID");
+        }catch (NotExpectedTimeOrder e){
+            System.out.println("Error: End time is earlier than start time");
+        }
     }
 
-    private String askForTaskID(boolean canBeZero){
-        String taskID;
-        boolean isValidTaskID;
-        do{
-            System.out.print("New task ID: ");
-            taskID = scanner.nextLine();
-            Task task = new Task(taskID);
-            isValidTaskID = task.isValidTaskId() || (canBeZero && taskID.equals(""));
-        }while(!isValidTaskID);
+    private String askForTaskID(){
+        System.out.print("New task ID: ");
+        String taskID = scanner.nextLine();
         return taskID;
     }
     
-    private void printLastTaskOfTheDay(){
-        if (!chosenDay.getTasks().isEmpty()){
+    private void printLatestEndTimeOfTheDay(){
             System.out.println(
                     "Latest end time of the day: (" + chosenDay.getLatestEndTime().toString() + ")");
-        }else {
-            System.out.println("This day contains no tasks");
-        }
     }
     
     //Will also accept empty input if the chosen day contains tasks (for entry 6)
@@ -305,9 +304,8 @@ public class TimeLoggerUI {
         do{
             System.out.print("Starting time (HH:MM): ");
             input = scanner.nextLine();
-            boolean dayContainsTasks = !chosenDay.getTasks().isEmpty();
             boolean isValidForm = Pattern.matches("^\\d\\d:\\d\\d$",input) ||
-                    (dayContainsTasks && input.equals("")) || (canBeZero && input.equals(""));
+                    (canBeZero && input.equals(""));
             if (isValidForm && !input.equals("")){
                 hour = Integer.valueOf(input.substring(0,1));
                 minute = Integer.valueOf(input.substring(3,4));
@@ -316,11 +314,7 @@ public class TimeLoggerUI {
             }
             isValidTime = isValidForm && hour>=0 && hour<24 && minute>=0 && minute<60;
         }while(!isValidTime);
-        if (input.equals("") && !canBeZero){
-            return chosenDay.getLatestEndTime().toString();
-        }else {
-            return input;
-        }
+        return input;
     }
     
     private void addTaskEndTimeToTask(){
@@ -342,7 +336,7 @@ public class TimeLoggerUI {
     private void printUnfinishedTasksForChosenDay(){
         System.out.println("The unfinished tasks:");
         for (Task currentTask : chosenDay.getTasks()) {
-            if (currentTask.getEndTime() == currentTask.getStartTime()){
+            if (currentTask.getEndTime().equals(currentTask.getStartTime())){
                 System.out.println(currentTask.getTaskId() + " " +
                     currentTask.getComment() + " " + currentTask.getStartTime() +
                     " end time not specified yet\n");
@@ -356,12 +350,12 @@ public class TimeLoggerUI {
             System.out.println("The task ID: ");
             chosenTaskID = scanner.nextLine();
             for (Task currentTask : chosenDay.getTasks()) {
-                if (currentTask.getEndTime() == currentTask.getStartTime() &&
+                if (currentTask.getEndTime().equals(currentTask.getStartTime()) &&
                         currentTask.getTaskId().equals(chosenTaskID)){
                     return currentTask;
                 }
-            System.out.println("Not an existing task ID");
             }
+            System.out.println("Not an existing task ID or the end time is already specified");
         }
     }
     
@@ -409,16 +403,17 @@ public class TimeLoggerUI {
     private void modifyTask(){
         listTasksForChosenDay();
         Task taskToModify = askForExistingTask();
-        chosenDay.getTasks().remove(taskToModify);
+        chosenDay.getTasks().remove(taskToModify);  //In the valid values part, we check if the time interval ovarlaps with an existing one
         Task modifiedTask = askForValidNewTaskValuesFor(taskToModify);
         chosenDay.addTask(modifiedTask);
     }
     
-    private Task askForValidNewTaskValuesFor(Task taskToModify){
-        Task modifiedTask;
+    private Task askForValidNewTaskValuesFor(Task taskToModify)
+    /*throws NoTaskIdException, InvalidTaskIdException*/{
+        Task modifiedTask = null;
         System.out.println("Leave a field empty if you do not want to change it\n");
         System.out.println("Current ID: (" + taskToModify.getTaskId() + ")");
-        String newID = askForTaskID(true);
+        String newID = askForTaskID();
         if (newID.equals("")){
             newID = taskToModify.getTaskId();
         }
@@ -428,7 +423,7 @@ public class TimeLoggerUI {
         if (newComment.equals("")){
             newComment = taskToModify.getComment();
         }
-        boolean timeIsValid;
+        boolean timeIsValid = false;
         do{
             System.out.println("Current start time: (" + taskToModify.getStartTime()+ ")");
             String newStartTime = askForStartTime(true);
@@ -440,7 +435,18 @@ public class TimeLoggerUI {
             if (newEndTime.equals("")){
                 newEndTime = taskToModify.getEndTime().toString();
             }
-            modifiedTask = new Task(newID, newComment, newStartTime, newEndTime);
+            try{
+                modifiedTask = new Task(newID, newComment, newStartTime, newEndTime);
+            }catch (NoTaskIdException e){
+                System.out.println("Error: empty task ID");
+                continue;
+            }catch (InvalidTaskIdException e){
+                System.out.println("Error: invalid task ID");
+                continue;
+            }catch (NotExpectedTimeOrder e){
+                System.out.println("Error: End time is earlier than start time");
+                continue;
+            }
             timeIsValid = Util.isSeparatedTime(modifiedTask, chosenDay.getTasks()) &&
                     Util.isMultipleQuarterHour(modifiedTask.getStartTime(),modifiedTask.getEndTime());
             if (!timeIsValid){

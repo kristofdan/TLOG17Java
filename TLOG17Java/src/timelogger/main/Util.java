@@ -1,4 +1,4 @@
-package Main;
+package timelogger.main;
 
 import java.time.*;
 import java.util.*;
@@ -44,13 +44,15 @@ public class Util {
         return endOfFirstIsLaterThanStartOfSecond && endOfFirstIsEarlierThanEndOfSecond;
     }
     
-    public static long roundToMultipleQuarterHour(LocalTime startTime, LocalTime endTime){
+    //EndTime can be rounded past midnight
+    public static LocalTime roundToMultipleQuarterHour(LocalTime startTime, LocalTime endTime){
         long duration = minPerTask(startTime, endTime);
         long remainder = duration % 15;
-        if (remainder < 8){
-            return duration - remainder;
+        boolean wouldBeRoundedToZeroLength = remainder<8 && endTime.minusMinutes(remainder).equals(startTime);
+        if (remainder<8 && !wouldBeRoundedToZeroLength){
+            return endTime.minusMinutes(remainder);
         }else {
-            return duration + (15 - remainder);
+            return endTime.plusMinutes(15 - remainder);
         }
     }
     

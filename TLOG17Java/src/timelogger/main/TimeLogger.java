@@ -1,6 +1,7 @@
 package timelogger.main;
 
 import java.util.*;
+import timelogger.exceptions.NotNewMonthException;
 
 public class TimeLogger{
     private List<WorkMonth> months;
@@ -11,7 +12,7 @@ public class TimeLogger{
     
     public void addMonth(WorkMonth month){
         if (isNewMonth(month)) months.add(month);
-        else System.out.println("This month already exists");
+        else throw new NotNewMonthException();
     }
     
     public boolean isNewMonth(WorkMonth monthToCompare){

@@ -201,17 +201,18 @@ public class TimeLoggerUI {
     }
     
     private void addDayToMonth(){
-        boolean dayWasSuccesfullyAdded;
         listMonths();
         if (loggerContainsMonths){
             chosenMonth = askForExistingMonth();
-            do{
-                int day = askForDayInChosenMonth();
-                int requiredMinutes = askForRequiredWorkingMinutes();
-                WorkDay newDay = new WorkDay(requiredMinutes,chosenMonth.getDate().getYear(),
-                        chosenMonth.getDate().getMonthValue(),day);
-                dayWasSuccesfullyAdded = chosenMonth.addWorkDay(newDay);
-            }while(!dayWasSuccesfullyAdded);
+            int day = askForDayInChosenMonth();
+            int requiredMinutes = askForRequiredWorkingMinutes();
+            WorkDay newDay = new WorkDay(requiredMinutes,chosenMonth.getDate().getYear(),
+                    chosenMonth.getDate().getMonthValue(),day);
+            try{
+                chosenMonth.addWorkDay(newDay);
+            }catch(Exception e){
+                System.out.println("Error: this day cannot be added to this month");
+            }
         }
         
     }

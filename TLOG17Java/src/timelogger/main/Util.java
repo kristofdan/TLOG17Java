@@ -3,6 +3,8 @@ package timelogger.main;
 import java.time.*;
 import java.util.*;
 import java.time.temporal.ChronoField;
+import timelogger.exceptions.EmptyTimeFieldException;
+import timelogger.exceptions.NotExpectedTimeOrder;
 
 public class Util {
     public static boolean isWeekday(LocalDate day){
@@ -57,6 +59,13 @@ public class Util {
     }
     
     public static long minPerTask(LocalTime startTime, LocalTime endTime){
+        if (startTime == null || endTime == null){
+            throw new EmptyTimeFieldException();
+        }
+        if (startTime.compareTo(endTime) > 0){
+            throw new NotExpectedTimeOrder();
+        }
+        
         long hourDiff =
                 endTime.getLong(ChronoField.HOUR_OF_DAY) - startTime.getLong(ChronoField.HOUR_OF_DAY);
         long minuteDiff =

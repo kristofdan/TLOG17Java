@@ -2,6 +2,9 @@ package timelogger.main;
 
 import java.util.*;
 import java.time.*;
+import timelogger.exceptions.NotNewDateException;
+import timelogger.exceptions.NotTheSameMonthException;
+import timelogger.exceptions.WeekendNotEnabledException;
 
 public class WorkMonth {
     private List<WorkDay> days;
@@ -16,20 +19,20 @@ public class WorkMonth {
     
     //Can return negative value
     public long getExtraMinPerMonth(){
+        calculateSumPerMonth();
+        calculateRequiredMinPerMonth();
         return sumPerMonth - requiredMinPerMonth;
     }
     
-    public boolean addWorkDay(WorkDay wd){
-        return addWorkDay(wd, false);
+    public void addWorkDay(WorkDay wd){
+        addWorkDay(wd, false);
     }
     
-    public boolean addWorkDay(WorkDay wd, boolean isWeekendEnabled){
+    public void addWorkDay(WorkDay wd, boolean isWeekendEnabled){
         if ((Util.isWeekday(wd.getActualDay()) || isWeekendEnabled) && isSameMonth(wd) && isNewDate(wd)){
             days.add(wd);
-            return true;
         }else {
-            System.out.println("Not a proper day for this month");
-            return false;
+            throwAppropriateException(wd,isWeekendEnabled);
         }
     }
     
@@ -46,6 +49,16 @@ public class WorkMonth {
             return true;
         }
         else return false;
+    }
+    
+    private void throwAppropriateException(WorkDay wd,boolean isWeekendEnabled){
+       if (!Util.isWeekday(wd.getActualDay()) && !isWeekendEnabled){
+           throw new WeekendNotEnabledException();
+       }else if(!isSameMonth(wd)){
+           throw new NotTheSameMonthException();
+       }else {
+           throw new NotNewDateException();
+       }
     }
     
     private void calculateSumPerMonth(){

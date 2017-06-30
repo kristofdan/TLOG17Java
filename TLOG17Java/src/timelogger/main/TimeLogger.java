@@ -3,6 +3,12 @@ package timelogger.main;
 import java.util.*;
 import timelogger.exceptions.NotNewMonthException;
 
+/**
+ * A timelogger is represented by the WorkMonth's within it.
+ * 
+ * @author Kristóf Dan
+ */
+
 @lombok.Getter
 
 public class TimeLogger{

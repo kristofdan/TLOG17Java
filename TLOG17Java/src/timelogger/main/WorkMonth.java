@@ -6,6 +6,13 @@ import timelogger.exceptions.NotNewDateException;
 import timelogger.exceptions.NotTheSameMonthException;
 import timelogger.exceptions.WeekendNotEnabledException;
 
+/**
+ * A workmonth is represented by the days within it, it's date, the reqired working minutes and the sum of
+ * it's tasks length.
+ * 
+ * @author Kristóf Dan
+ */
+
 @lombok.Getter
 public class WorkMonth {
     private List<WorkDay> days;
@@ -18,6 +25,10 @@ public class WorkMonth {
         days = new LinkedList<>();
     }
     
+    /**
+     *
+     * The number of minutes that are above the required minutes. 
+     */
     //Can return negative value
     public long getExtraMinPerMonth()
         throws Exception
@@ -27,6 +38,9 @@ public class WorkMonth {
         return sumPerMonth - requiredMinPerMonth;
     }
     
+    /**
+     * The day must be a weekday.
+     */
     public void addWorkDay(WorkDay wd)
         throws Exception
     {

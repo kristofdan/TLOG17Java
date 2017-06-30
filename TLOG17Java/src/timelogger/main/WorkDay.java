@@ -4,6 +4,13 @@ import java.util.*;
 import java.time.*;
 import timelogger.exceptions.*;
 
+/**
+ * A workday is represented by the tasks within it, it's date, the reqired working minutes and the sum of
+ * it's tasks length.
+ * 
+ * @author Kristóf Dan
+ */
+
 @lombok.Getter
 public class WorkDay {
     private List<Task> tasks;
@@ -11,8 +18,10 @@ public class WorkDay {
     private long requiredMinPerDay;
     private long sumPerDay;
 
-//5 constructors for default arguments, default requiredMinPerDay: 450, actualDay: today
-    
+//4 constructors for default arguments, default requiredMinPerDay: 450, actualDay: today
+    /**
+     * Requred minutes will be 450, the date: today. 
+     */
     public WorkDay()
         throws Exception
     {
@@ -20,6 +29,10 @@ public class WorkDay {
                 LocalDate.now().getMonthValue(), LocalDate.now().getDayOfMonth());
     }
     
+    /**
+     * Creates a WorkDay if requiredMinPerDay isn't negative.
+     * The date will be today.
+     */
     public WorkDay(long requiredMinPerDay)
         throws Exception
     {
@@ -27,12 +40,19 @@ public class WorkDay {
                 LocalDate.now().getMonthValue(), LocalDate.now().getDayOfMonth());
     }
     
+    /**
+     * Creates a WorkDay if the date isn't later than today.
+     * Reuired minutes will be 450.
+     */
     public WorkDay(int year, int month, int day)
         throws Exception
     {
         this(450, year, month, day);
     }
     
+    /**
+     * Creates a WorkDay if requiredMinPerDay isn't negative and the date isn't later than today.
+     */
     public WorkDay(long requiredMinPerDay, int year, int month, int day)
         throws Exception
     {
@@ -53,6 +73,10 @@ public class WorkDay {
         tasks = new LinkedList<>();
     }
     
+    /**
+     * Adds a task to the day if the task's time interval doesn't overlap with the
+     * already added tasks intervals.
+     */
     public void addTask(Task t)
         throws Exception
     {
@@ -73,6 +97,9 @@ public class WorkDay {
        }
    }
    
+    /**
+     * The number of minutes that are above the required minutes.
+     */
     public long getExtraMinPerDay()
         throws Exception
     {
@@ -80,6 +107,9 @@ public class WorkDay {
         return sumPerDay - requiredMinPerDay;
     }
     
+    /**
+     * If there are no tasks, returns 00:00.
+     */
     //DIfferent from requested: If there are no tasks, returns 00:00 (more convenient to use)
     public LocalTime getLatestEndTime()
         throws Exception
@@ -104,6 +134,9 @@ public class WorkDay {
         return sumPerDay;
     }
     
+    /**
+     * The must not be later than today.
+     */
     public void setActualDay(int year, int month, int day) 
         throws Exception
     {
@@ -114,7 +147,10 @@ public class WorkDay {
             actualDay = newActualDay;
         }
     }
-
+    
+    /**
+     * Must not be negative.
+     */
     public void setRequiredMinPerDay(long requiredMinPerDay)
         throws Exception
     {

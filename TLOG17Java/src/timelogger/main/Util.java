@@ -6,6 +6,12 @@ import java.time.temporal.ChronoField;
 import timelogger.exceptions.EmptyTimeFieldException;
 import timelogger.exceptions.NotExpectedTimeOrder;
 
+/**
+ * Utility functions for the non-IU classes of this package. 
+ * 
+ * @author Kristóf Dan
+ */
+
 public class Util {
     public static boolean isWeekday(LocalDate day){
         DayOfWeek dayOfWeek = day.getDayOfWeek();
@@ -60,6 +66,9 @@ public class Util {
         return endOfFirstIsLaterThanStartOfSecond && endOfFirstIsEarlierThanEndOfSecond;
     }
     
+    /**
+     * @return The rounded endTime.
+     */
     //EndTime can be rounded past midnight
     public static LocalTime roundToMultipleQuarterHour(LocalTime startTime, LocalTime endTime)
         throws Exception

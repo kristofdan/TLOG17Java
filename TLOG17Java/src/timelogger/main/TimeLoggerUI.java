@@ -5,6 +5,11 @@ import java.util.regex.Pattern;
 import java.time.*;
 import timelogger.exceptions.*;
 
+/**
+ * Text based UI with the time logging functionalities.
+ * 
+ * @author Kristóf Dan
+ */
 public class TimeLoggerUI {
     
     public static void main(String[] args) {

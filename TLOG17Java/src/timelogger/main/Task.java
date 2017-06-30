@@ -6,6 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import timelogger.exceptions.*;
 
+/**
+ * A task is represented by a task ID, a description (comment), a start and an end time.
+ * 
+ * @author Kristóf Dan
+ */
+
 @Getter
 @Setter
 
@@ -15,6 +21,9 @@ public class Task {
     private LocalTime endTime;
     private String comment;
     
+    /**
+     * Constructs startTime and endTime from integer values.
+     */
     public Task(String taskId, String comment, int startHour, int startMinute, int endHour, int endMinute)
         throws Exception
     {
@@ -27,6 +36,9 @@ public class Task {
         setEndTimeSoThatDurationIsMultipleQuarterHour(startTime,endTime);
     }
     
+    /**
+     * Constructs startTime and endTime from Strings.
+     */
     public Task(String taskId, String comment, String startTimeString, String endTimeString)
         throws Exception
     {

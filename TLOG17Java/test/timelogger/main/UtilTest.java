@@ -9,11 +9,14 @@ import timelogger.exceptions.NotExpectedTimeOrder;
 
 public class UtilTest {
     
+    Task newTask;
+    LinkedList<Task> taskList;
+    
     public UtilTest() {
     }
 
     @Test
-    public void testCase1() {
+    public void testCase1() throws Exception {
         LocalTime startTime = LocalTime.of(7, 30);
         LocalTime endTime = LocalTime.of(7, 50);
         
@@ -23,7 +26,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase2() {
+    public void testCase2() throws Exception {
         LocalTime startTime = LocalTime.of(7, 30);
         LocalTime endTime = LocalTime.of(7, 50);
         
@@ -33,7 +36,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase3() {
+    public void testCase3() throws Exception {
         LocalTime startTime = LocalTime.of(7, 30);
         LocalTime endTime = LocalTime.of(7, 45);
         
@@ -43,19 +46,19 @@ public class UtilTest {
     }
     
     @Test(expected = EmptyTimeFieldException.class)
-    public void testCase4() {
+    public void testCase4() throws Exception {
         Util.isMultipleQuarterHour(null, LocalTime.of(7, 45));
     }
     
     @Test(expected = NotExpectedTimeOrder.class)
-    public void testCase5() {
+    public void testCase5() throws Exception {
         LocalTime startTime = LocalTime.of(8, 30);
         LocalTime endTime = LocalTime.of(7, 45);
         Util.isMultipleQuarterHour(startTime, endTime);
     }
     
     @Test
-    public void testCase6_1() {
+    public void testCase6_1() throws Exception {
         createTaskListWithTimeInterval("06:30","06:45");
         createTaskWithTimeInterval("05:30","06:30");
         
@@ -65,7 +68,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_2() {
+    public void testCase6_2() throws Exception {
         createTaskListWithTimeInterval("06:30","06:45");
         createTaskWithTimeInterval("06:45","07:00");
         
@@ -75,7 +78,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_3() {
+    public void testCase6_3() throws Exception {
         createTaskListWithTimeInterval("06:30","06:30");
         createTaskWithTimeInterval("05:30","06:30");
         
@@ -85,7 +88,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_4() {
+    public void testCase6_4() throws Exception {
         createTaskListWithTimeInterval("06:30","07:30");
         createTaskWithTimeInterval("07:30","07:30");
         
@@ -95,7 +98,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_5() {
+    public void testCase6_5() throws Exception {
         createTaskListWithTimeInterval("06:30","07:00");
         createTaskWithTimeInterval("06:00","06:45");
         
@@ -105,7 +108,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_6() {
+    public void testCase6_6() throws Exception {
         createTaskListWithTimeInterval("06:30","07:00");
         createTaskWithTimeInterval("06:30","06:45");
         
@@ -115,7 +118,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_7() {
+    public void testCase6_7() throws Exception {
         createTaskListWithTimeInterval("06:30","07:00");
         createTaskWithTimeInterval("06:45","07:15");
         
@@ -125,7 +128,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_8() {
+    public void testCase6_8() throws Exception {
         createTaskListWithTimeInterval("06:30","07:00");
         createTaskWithTimeInterval("06:45","07:00");
         
@@ -135,7 +138,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_9() {
+    public void testCase6_9() throws Exception {
         createTaskListWithTimeInterval("06:30","06:30");
         createTaskWithTimeInterval("06:30","07:00");
         
@@ -145,7 +148,7 @@ public class UtilTest {
     }
     
     @Test
-    public void testCase6_10() {
+    public void testCase6_10() throws Exception {
         createTaskListWithTimeInterval("06:30","07:30");
         createTaskWithTimeInterval("06:30","06:30");
         
@@ -154,16 +157,13 @@ public class UtilTest {
         assertEquals(false, newTaskIsSeparatedTime);
     }
     
-    private void createTaskListWithTimeInterval(String startTime, String endTime){
+    private void createTaskListWithTimeInterval(String startTime, String endTime) throws Exception{
         Task t = new Task("1234","",startTime, endTime);
         taskList = new LinkedList<>();
         taskList.add(t);
     }
     
-    private void createTaskWithTimeInterval(String startTime, String endTime){
+    private void createTaskWithTimeInterval(String startTime, String endTime) throws Exception{
         newTask = new Task("1234","",startTime, endTime);
     }
-    
-    Task newTask;
-    LinkedList<Task> taskList;
 }

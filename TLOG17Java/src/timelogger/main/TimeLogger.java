@@ -3,6 +3,8 @@ package timelogger.main;
 import java.util.*;
 import timelogger.exceptions.NotNewMonthException;
 
+@lombok.Getter
+
 public class TimeLogger{
     private List<WorkMonth> months;
 
@@ -10,9 +12,11 @@ public class TimeLogger{
         months = new LinkedList<>();
     }
     
-    public void addMonth(WorkMonth month){
+    public void addMonth(WorkMonth month)
+        throws Exception
+    {
         if (isNewMonth(month)) months.add(month);
-        else throw new NotNewMonthException();
+        else throw new NotNewMonthException("Error: cannot add this month to logger, a month with this date already exists");
     }
     
     public boolean isNewMonth(WorkMonth monthToCompare){
@@ -22,9 +26,5 @@ public class TimeLogger{
             }
         }
         return true;
-    }
-    
-    public List<WorkMonth> getMonths() {
-        return months;
     }
 }

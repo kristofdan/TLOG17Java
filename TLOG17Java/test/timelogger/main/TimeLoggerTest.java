@@ -15,7 +15,7 @@ public class TimeLoggerTest {
     }
 
     @Test
-    public void testCase1() {
+    public void testCase1() throws Exception {
         Task t = new Task("1234","","07:30","10:30");
         WorkDay wd = new WorkDay(2016, 4, 14);
         WorkMonth wm = new WorkMonth(2016, 4);
@@ -30,7 +30,7 @@ public class TimeLoggerTest {
     }
     
     @Test(expected = NotNewMonthException.class)
-    public void testCase2() {
+    public void testCase2() throws Exception {
         WorkMonth wm1 = new WorkMonth(2016, 4);
         WorkMonth wm2 = new WorkMonth(2016, 4);
         TimeLogger tl = new TimeLogger();

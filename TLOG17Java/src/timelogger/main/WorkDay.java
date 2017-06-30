@@ -4,6 +4,7 @@ import java.util.*;
 import java.time.*;
 import timelogger.exceptions.*;
 
+@lombok.Getter
 public class WorkDay {
     private List<Task> tasks;
     private LocalDate actualDay;
@@ -12,60 +13,77 @@ public class WorkDay {
 
 //5 constructors for default arguments, default requiredMinPerDay: 450, actualDay: today
     
-    public WorkDay() {
+    public WorkDay()
+        throws Exception
+    {
         this(450, LocalDate.now().getYear(),
                 LocalDate.now().getMonthValue(), LocalDate.now().getDayOfMonth());
     }
     
-    public WorkDay(long requiredMinPerDay) {
+    public WorkDay(long requiredMinPerDay)
+        throws Exception
+    {
         this(requiredMinPerDay, LocalDate.now().getYear(),
                 LocalDate.now().getMonthValue(), LocalDate.now().getDayOfMonth());
     }
     
-    public WorkDay(int year, int month, int day){
+    public WorkDay(int year, int month, int day)
+        throws Exception
+    {
         this(450, year, month, day);
     }
     
-    public WorkDay(long requiredMinPerDay, int year, int month, int day) {
+    public WorkDay(long requiredMinPerDay, int year, int month, int day)
+        throws Exception
+    {
         if (requiredMinPerDay < 0)
         {
-            throw new NegativeMinutesOfWorkException();
+            throw new NegativeMinutesOfWorkException(
+                    "Error: cannot construct day with negative required minutes");
         }else {
             this.requiredMinPerDay = requiredMinPerDay;
         }
         
         LocalDate newActualDay = LocalDate.of(year, month, day);
         if (newActualDay.isAfter(LocalDate.now())){
-            throw new FutureWorkException();
+            throw new FutureWorkException("Error: cannot construct day with date later than today");
         }else {
             actualDay = newActualDay;
         }
         tasks = new LinkedList<>();
     }
     
-    public void addTask(Task t){
+    public void addTask(Task t)
+        throws Exception
+    {
         if (Util.isSeparatedTime(t,tasks)){
             tasks.add(t);
         }
         else {
-            throw new NotSeparatedTimesException();
+            throw new NotSeparatedTimesException("Error: task cannot be added to day, it overlaps with other tasks within the day");
         }
     }
     
-    private void calculateSumPerDay(){
+    private void calculateSumPerDay()
+        throws Exception
+    {
        sumPerDay = 0;
        for (Task currentTask : tasks) {
            sumPerDay += currentTask.getMinPerTask();
        }
    }
    
-    public long getExtraMinPerDay(){
+    public long getExtraMinPerDay()
+        throws Exception
+    {
         calculateSumPerDay();
         return sumPerDay - requiredMinPerDay;
     }
     
     //DIfferent from requested: If there are no tasks, returns 00:00 (more convenient to use)
-    public LocalTime getLatestEndTime(){
+    public LocalTime getLatestEndTime()
+        throws Exception
+    {
         if (tasks.isEmpty()){
             return LocalTime.of(0, 0);
         }else {
@@ -79,37 +97,32 @@ public class WorkDay {
         }
     }
 
-    public LocalDate getActualDay() {
-        return actualDay;
-    }
-
-    public long getRequiredMinPerDay() {
-        return requiredMinPerDay;
-    }
-
-    public long getSumPerDay() {
+    public long getSumPerDay()
+        throws Exception
+    {
         calculateSumPerDay();
         return sumPerDay;
     }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
     
-    public void setActualDay(int year, int month, int day) {
+    public void setActualDay(int year, int month, int day) 
+        throws Exception
+    {
         LocalDate newActualDay = LocalDate.of(year, month, day);
         if (newActualDay.isAfter(LocalDate.now())){
-            throw new FutureWorkException();
+            throw new FutureWorkException("Error: cannot set a day's date to a date later than today");
         }else {
             actualDay = newActualDay;
         }
     }
 
-    public void setRequiredMinPerDay(long requiredMinPerDay) {
+    public void setRequiredMinPerDay(long requiredMinPerDay)
+        throws Exception
+    {
         if (requiredMinPerDay < 0)
         {
-            throw new NegativeMinutesOfWorkException();
-        }else {
+            throw new NegativeMinutesOfWorkException(
+                    "Error: cannot set a day's reuired minutes to negative value");
+        }else { 
             this.requiredMinPerDay = requiredMinPerDay;
         }
     }

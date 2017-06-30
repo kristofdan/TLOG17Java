@@ -6,6 +6,7 @@ import timelogger.exceptions.NotNewDateException;
 import timelogger.exceptions.NotTheSameMonthException;
 import timelogger.exceptions.WeekendNotEnabledException;
 
+@lombok.Getter
 public class WorkMonth {
     private List<WorkDay> days;
     private YearMonth date;
@@ -18,17 +19,23 @@ public class WorkMonth {
     }
     
     //Can return negative value
-    public long getExtraMinPerMonth(){
+    public long getExtraMinPerMonth()
+        throws Exception
+    {
         calculateSumPerMonth();
         calculateRequiredMinPerMonth();
         return sumPerMonth - requiredMinPerMonth;
     }
     
-    public void addWorkDay(WorkDay wd){
+    public void addWorkDay(WorkDay wd)
+        throws Exception
+    {
         addWorkDay(wd, false);
     }
     
-    public void addWorkDay(WorkDay wd, boolean isWeekendEnabled){
+    public void addWorkDay(WorkDay wd, boolean isWeekendEnabled)
+        throws Exception
+    {
         if ((Util.isWeekday(wd.getActualDay()) || isWeekendEnabled) && isSameMonth(wd) && isNewDate(wd)){
             days.add(wd);
         }else {
@@ -51,17 +58,21 @@ public class WorkMonth {
         else return false;
     }
     
-    private void throwAppropriateException(WorkDay wd,boolean isWeekendEnabled){
+    private void throwAppropriateException(WorkDay wd,boolean isWeekendEnabled)
+       throws Exception
+    {
        if (!Util.isWeekday(wd.getActualDay()) && !isWeekendEnabled){
-           throw new WeekendNotEnabledException();
+           throw new WeekendNotEnabledException("Error: cannot add day to month, day is not weekday and weekend not enabled");
        }else if(!isSameMonth(wd)){
-           throw new NotTheSameMonthException();
+           throw new NotTheSameMonthException("Error: cannot add day to month, the day's date is in a different month");
        }else {
-           throw new NotNewDateException();
+           throw new NotNewDateException("Error: cannot add day to month, a day with this date already exists");
        }
     }
     
-    private void calculateSumPerMonth(){
+    private void calculateSumPerMonth()
+        throws Exception
+    {
         sumPerMonth = 0;
         for (WorkDay currentDay : days) {
             sumPerMonth += currentDay.getSumPerDay();
@@ -74,16 +85,10 @@ public class WorkMonth {
             requiredMinPerMonth += currentDay.getRequiredMinPerDay();
         }
     }
-    
-    public List<WorkDay> getDays() {
-        return days;
-    }
 
-    public YearMonth getDate() {
-        return date;
-    }
-
-    public long getSumPerMonth() {
+    public long getSumPerMonth()
+        throws Exception
+    {
         calculateSumPerMonth();
         return sumPerMonth;
     }

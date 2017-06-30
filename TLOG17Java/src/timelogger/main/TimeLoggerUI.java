@@ -8,7 +8,6 @@ import timelogger.exceptions.*;
 public class TimeLoggerUI {
     
     public static void main(String[] args) {
-        System.out.println(Util.minPerTask(LocalTime.of(0, 0), LocalTime.of(12,0)));
         TimeLoggerUI ui = new TimeLoggerUI();
         ui.logger = new TimeLogger();
         
@@ -55,25 +54,29 @@ public class TimeLoggerUI {
         System.out.println("4. Add new month\n");
         System.out.println("5. Add day to specific month\n");
         System.out.println("6. Add a task for a day\n");
-        System.out.println("7. Finish a specific task:\n");
+        System.out.println("7. Finish a specific task\n");
         System.out.println("8. Delete a task\n");
         System.out.println("9. Modify a task\n");
         System.out.println("10. Print satistics of a month\n");
     }
     
     private void performTaskCorrespondingTo(int entryNumber){
-        switch (entryNumber) {
-            case 0: break;
-            case 1: listMonths(); break;
-            case 2: askForMonthThenListDays(); break;
-            case 3: listTasksForChosenDay(); break;
-            case 4: addNewMonth(); break;
-            case 5: addDayToMonth(); break;
-            case 6: addTaskToDay(); break;
-            case 7: addTaskEndTimeToTask(); break;
-            case 8: deleteTask(); break;
-            case 9: modifyTask(); break;
-            case 10: printStatisticsForMonth(); break;
+        try{
+            switch (entryNumber) {
+                case 0: break;
+                case 1: listMonths(); break;
+                case 2: askForMonthThenListDays(); break;
+                case 3: listTasksForChosenDay(); break;
+                case 4: addNewMonth(); break;
+                case 5: addDayToMonth(); break;
+                case 6: addTaskToDay(); break;
+                case 7: addTaskEndTimeToTask(); break;
+                case 8: deleteTask(); break;
+                case 9: modifyTask(); break;
+                case 10: printStatisticsForMonth(); break;
+            }
+        }catch(Exception e){
+            System.out.println(e.getMessage());
         }
     }
     
@@ -142,7 +145,11 @@ public class TimeLoggerUI {
             chosenDay = askForExistingDay();
             boolean chosenDayContainsTasks = !chosenDay.getTasks().isEmpty();
             if (chosenDayContainsTasks){
-                printTasksForChosenDay();
+                try{
+                    printTasksForChosenDay();
+                }catch(Exception e){
+                    System.out.println(e.getMessage());
+                }
             }else {
                 System.out.println("This day contains no tasks");
             }
@@ -170,7 +177,7 @@ public class TimeLoggerUI {
         return chosenMonth.getDays().get(dayIndex);
     }
     
-    private void printTasksForChosenDay(){
+    private void printTasksForChosenDay() throws Exception {
         System.out.println("The tasks:");
         for (Task currentTask : chosenDay.getTasks()) {
             System.out.print(currentTask.getTaskId() + " " + currentTask.getComment() + " " +
@@ -197,7 +204,11 @@ public class TimeLoggerUI {
             }
         }while(!isValidDate);
         WorkMonth newMonth = new WorkMonth(year, month);
-        logger.addMonth(newMonth);
+        try{
+            logger.addMonth(newMonth);
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
     }
     
     private void addDayToMonth(){
@@ -206,12 +217,12 @@ public class TimeLoggerUI {
             chosenMonth = askForExistingMonth();
             int day = askForDayInChosenMonth();
             int requiredMinutes = askForRequiredWorkingMinutes();
+            try{
             WorkDay newDay = new WorkDay(requiredMinutes,chosenMonth.getDate().getYear(),
                     chosenMonth.getDate().getMonthValue(),day);
-            try{
                 chosenMonth.addWorkDay(newDay);
             }catch(Exception e){
-                System.out.println("Error: this day cannot be added to this month");
+                System.out.println(e.getMessage());
             }
         }
         
@@ -262,25 +273,21 @@ public class TimeLoggerUI {
     }
     
     //Sets endTime to startTime (couldn't insert it if endTime would be empty)
-    private void addTaskToDay(){
+    private void addTaskToDay() throws Exception{
         listTasksForChosenDay();
         String taskID = askForTaskID();
         System.out.println("Description: ");
         String comment = scanner.nextLine();
         printLatestEndTimeOfTheDay();
         String startTime = askForStartTime(true);
-        if (startTime.equals("")){
-            startTime = chosenDay.getLatestEndTime().toString();
-        }
         try{
+            if (startTime.equals("")){
+                startTime = chosenDay.getLatestEndTime().toString();
+            }
             Task newTask = new Task(taskID,comment,startTime,startTime);
             chosenDay.addTask(newTask);
-        }catch (NoTaskIdException e){
-            System.out.println("Error: empty task ID");
-        }catch (InvalidTaskIdException e){
-            System.out.println("Error: invalid task ID");
-        }catch (NotExpectedTimeOrder e){
-            System.out.println("Error: End time is earlier than start time");
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         }
     }
 
@@ -290,7 +297,7 @@ public class TimeLoggerUI {
         return taskID;
     }
     
-    private void printLatestEndTimeOfTheDay(){
+    private void printLatestEndTimeOfTheDay() throws Exception{
             System.out.println(
                     "Latest end time of the day: (" + chosenDay.getLatestEndTime().toString() + ")");
     }
@@ -318,7 +325,7 @@ public class TimeLoggerUI {
         return input;
     }
     
-    private void addTaskEndTimeToTask(){
+    private void addTaskEndTimeToTask() throws Exception{
         askForMonthThenListDays();
         if (loggerContainsMonths && chosenMonthContainsDays){
             chosenDay = askForExistingDay();
@@ -334,7 +341,7 @@ public class TimeLoggerUI {
         }
     }
     
-    private void printUnfinishedTasksForChosenDay(){
+    private void printUnfinishedTasksForChosenDay() throws Exception{
         System.out.println("The unfinished tasks:");
         for (Task currentTask : chosenDay.getTasks()) {
             if (currentTask.getEndTime().equals(currentTask.getStartTime())){
@@ -345,7 +352,7 @@ public class TimeLoggerUI {
         }
     }
     
-    private Task askForExistingTaskWithUnfinishedTime(){
+    private Task askForExistingTaskWithUnfinishedTime() throws Exception{
         String chosenTaskID;
         while(true){
             System.out.println("The task ID: ");
@@ -401,7 +408,7 @@ public class TimeLoggerUI {
         }
     }
     
-    private void modifyTask(){
+    private void modifyTask() throws Exception{
         listTasksForChosenDay();
         Task taskToModify = askForExistingTask();
         chosenDay.getTasks().remove(taskToModify);  //In the valid values part, we check if the time interval ovarlaps with an existing one
@@ -409,8 +416,7 @@ public class TimeLoggerUI {
         chosenDay.addTask(modifiedTask);
     }
     
-    private Task askForValidNewTaskValuesFor(Task taskToModify)
-    /*throws NoTaskIdException, InvalidTaskIdException*/{
+    private Task askForValidNewTaskValuesFor(Task taskToModify) throws Exception{
         Task modifiedTask = null;
         System.out.println("Leave a field empty if you do not want to change it\n");
         System.out.println("Current ID: (" + taskToModify.getTaskId() + ")");
@@ -438,14 +444,8 @@ public class TimeLoggerUI {
             }
             try{
                 modifiedTask = new Task(newID, newComment, newStartTime, newEndTime);
-            }catch (NoTaskIdException e){
-                System.out.println("Error: empty task ID");
-                continue;
-            }catch (InvalidTaskIdException e){
-                System.out.println("Error: invalid task ID");
-                continue;
-            }catch (NotExpectedTimeOrder e){
-                System.out.println("Error: End time is earlier than start time");
+            }catch (Exception e){
+                System.out.println(e.getMessage());
                 continue;
             }
             timeIsValid = Util.isSeparatedTime(modifiedTask, chosenDay.getTasks()) &&
@@ -457,20 +457,20 @@ public class TimeLoggerUI {
         return modifiedTask;
     }
     
-    private void printStatisticsForMonth(){
+    private void printStatisticsForMonth() throws Exception{
         listMonths();
         chosenMonth = askForExistingMonth();
         printMonthStatisticsForChosenMonth();
         printDayStatisticsForChosenMonth();
     }
     
-    private void printMonthStatisticsForChosenMonth(){
+    private void printMonthStatisticsForChosenMonth() throws Exception{
         System.out.println("The month's statistics:\n");
         System.out.println(chosenMonth.getDate()+ " " + chosenMonth.getSumPerMonth()+ " " + 
                     chosenMonth.getRequiredMinPerMonth() + " " + chosenMonth.getExtraMinPerMonth() + "\n");
     }
 
-    private void printDayStatisticsForChosenMonth(){
+    private void printDayStatisticsForChosenMonth() throws Exception{
         System.out.println("The daily statistics:\n");
         for (WorkDay currentDay : chosenMonth.getDays()) {
             System.out.println(currentDay.getActualDay() + " " + currentDay.getSumPerDay() + " " + 

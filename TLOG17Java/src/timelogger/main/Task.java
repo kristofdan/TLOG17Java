@@ -2,7 +2,12 @@ package timelogger.main;
 
 import java.time.*;
 import java.util.regex.*;
+import lombok.Getter;
+import lombok.Setter;
 import timelogger.exceptions.*;
+
+@Getter
+@Setter
 
 public class Task {
     private String taskId;
@@ -11,7 +16,8 @@ public class Task {
     private String comment;
     
     public Task(String taskId, String comment, int startHour, int startMinute, int endHour, int endMinute)
-    /*throws NoTaskIdException, InvalidTaskIdException*/ {
+        throws Exception
+    {
         LocalTime startTime = LocalTime.of(startHour, startMinute);
         LocalTime endTime = LocalTime.of(endHour, endMinute);
         checkIfValidTimeOrder(startTime,endTime);
@@ -22,7 +28,8 @@ public class Task {
     }
     
     public Task(String taskId, String comment, String startTimeString, String endTimeString)
-    /*throws NoTaskIdException, InvalidTaskIdException*/ {
+        throws Exception
+    {
         LocalTime startTime = LocalTime.parse(startTimeString);
         LocalTime endTime = LocalTime.parse(endTimeString);
         checkIfValidTimeOrder(startTime,endTime);
@@ -32,41 +39,50 @@ public class Task {
         setEndTimeSoThatDurationIsMultipleQuarterHour(startTime,endTime);
     }
 
-    public Task(String taskId) /*throws NoTaskIdException, InvalidTaskIdException*/ {
+    public Task(String taskId) throws Exception {
         setTaskIdIfValid(taskId);
+
     }
     
-    //throws NotExpectedTimeOrder
-    private void checkIfValidTimeOrder(LocalTime startTime, LocalTime endTime){
+    
+    private void checkIfValidTimeOrder(LocalTime startTime, LocalTime endTime)
+        throws Exception
+    {
         if (startTime.compareTo(endTime) > 0){
-            throw new NotExpectedTimeOrder();
+            throw new NotExpectedTimeOrder("Error: Not a valid time interval");
         }
         
     }
     
     private void setTaskIdIfValid(String taskId)
-    /*throws NoTaskIdException, InvalidTaskIdException*/ {
+        throws Exception
+    {
         if (isValidTaskId(taskId)){
             this.taskId = taskId;
         }else if (taskId.equals("")){
-            throw new NoTaskIdException();
+            throw new NoTaskIdException("Error: missing task ID");
         }
         else {
-            throw new InvalidTaskIdException();
+            throw new InvalidTaskIdException("Error: invalid task ID");
         }
     }
     
-    private void setEndTimeSoThatDurationIsMultipleQuarterHour(LocalTime startTime, LocalTime endTime){
+    private void setEndTimeSoThatDurationIsMultipleQuarterHour(LocalTime startTime, LocalTime endTime)
+        throws Exception
+    {
         this.endTime = Util.roundToMultipleQuarterHour(startTime, endTime);
     }
     
-    public long getMinPerTask() {
+    public long getMinPerTask() 
+        throws Exception
+    {
         if (startTime == null || endTime == null){
-            throw new EmptyTimeFieldException();
+            throw new EmptyTimeFieldException("Error: time field missing from task");
         }else {
             return Util.minPerTask(startTime, endTime);
         }
     }
+    
     public boolean isValidTaskId(String taskId){
         return isValidRedmineTaskId(taskId) || isValidLTTaskId(taskId);
     }
@@ -82,64 +98,64 @@ public class Task {
     public String toString(){
         return taskId + " " + comment;
     }
-
-    public String getTaskId() {
-        return taskId;
-    }
     
-    public LocalTime getStartTime() {
+    public LocalTime getStartTime() throws Exception {
         if (startTime == null || endTime == null){
-            throw new EmptyTimeFieldException();
+            throw new EmptyTimeFieldException("Error: start time missing from task");
         }else {
             return startTime;
         }
     }
     
-    public LocalTime getEndTime() {
+    public LocalTime getEndTime()
+        throws Exception
+    {
         if (startTime == null || endTime == null){
-            throw new EmptyTimeFieldException();
+            throw new EmptyTimeFieldException("Error: end time missing from task");
         }else {
             return endTime;
         }
     }
     
-    public String getComment() {
-        return comment;
-    }
-    
-    public void setTaskId(String taskId) {
+    public void setTaskId(String taskId)
+        throws Exception
+    {
         setTaskIdIfValid(taskId);
     }
 
-    public void setStartTime(int hour, int minute) {
+    public void setStartTime(int hour, int minute)
+        throws Exception 
+    {
         LocalTime newStartTime = LocalTime.of(hour, minute);
         checkIfValidTimeOrder(newStartTime,endTime);
         startTime = newStartTime;
         setEndTimeSoThatDurationIsMultipleQuarterHour(startTime, endTime);
     }
     
-    public void setStartTime(String startTimeAsString) {
+    public void setStartTime(String startTimeAsString)
+        throws Exception
+    {
         LocalTime newStartTime = LocalTime.parse(startTimeAsString);
         checkIfValidTimeOrder(newStartTime,endTime);
         startTime = newStartTime;
         setEndTimeSoThatDurationIsMultipleQuarterHour(startTime, endTime);
     }
 
-    public void setEndTime(int hour, int minute) {
+    public void setEndTime(int hour, int minute)
+        throws Exception
+    {
         LocalTime newEndTime = LocalTime.of(hour, minute);
         checkIfValidTimeOrder(startTime,newEndTime);
         endTime = newEndTime;
         setEndTimeSoThatDurationIsMultipleQuarterHour(startTime, endTime);
     }
     
-    public void setEndTime(String endTimeAsString) {
+    public void setEndTime(String endTimeAsString)
+        throws Exception
+    {
         LocalTime newEndTime = LocalTime.parse(endTimeAsString);
         checkIfValidTimeOrder(startTime,newEndTime);
         endTime = newEndTime;
         setEndTimeSoThatDurationIsMultipleQuarterHour(startTime, endTime);
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 }
